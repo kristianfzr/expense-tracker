@@ -3,6 +3,7 @@ import csv
 import argparse
 from pathlib import Path
 from datetime import datetime
+from prettytable import PrettyTable
 
 expense_DIR = Path(__file__).parent / "data"
 expense_DIR.mkdir(exist_ok=True)
@@ -57,8 +58,11 @@ def list_expenses(filename):
     else:
         expenses = []
         
-    print(expenses)
-
+    tab = PrettyTable(fields)
+    for expense in expenses:
+        tab.add_row([expense['ID'], expense['Date'], expense['Description'], expense['Amount']])
+    print(tab)
+    
 if __name__ == "__main__":
     if args.command == 'add':
         add_expense(filename, args.description, args.amount)
