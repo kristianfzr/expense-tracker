@@ -10,8 +10,13 @@ filename = expense_DIR / "expenses.csv"
 fields = ['ID', 'Date', 'Description', 'Amount']
 
 parser = argparse.ArgumentParser(description='Espense Tracker')
-parser.add_argument('description', type=str, help='Description of the expense')
-parser.add_argument('amount', type=float, help='Amount of the expense')
+subparsers = parser.add_subparsers(dest='command', help='Available commands')
+
+add_parser = subparsers.add_parser('add', help='Add new expense')
+add_parser.add_argument('--description', type=str, required=True, help='Description of the expense')
+add_parser.add_argument('--amount', type=float, required=True, help='Amount of the expense')
+
+list_parser = subparsers.add_parser('list', help='List all expenses')
 
 args = parser.parse_args()
 
@@ -41,5 +46,21 @@ def add_expense(filename, description, amount):
         
     print(expense)
     
+def list_expenses(filename):
+    if os.path.exists(filename):
+        with open(filename, "r") as file:
+            try:
+                reader = csv.DictReader(file)
+                expenses = list(reader)
+            except csv.Error:
+                expenses = []
+    else:
+        expenses = []
+        
+    print(expenses)
+
 if __name__ == "__main__":
-    add_expense(filename, args.description, args.amount)
+    if args.command == 'add':
+        add_expense(filename, args.description, args.amount)
+    elif args.command == 'list':
+        list_expenses(filename)
