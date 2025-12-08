@@ -20,6 +20,14 @@ add_parser.add_argument('--amount', type=float, required=True, help='Amount of t
 list_parser = subparsers.add_parser('list', help='List all expenses')
 list_parser = subparsers.add_parser('summary', help='Summarize all expenses')
 
+delete_parser = subparsers.add_parser('delete', help='Delete expense by Id')
+delete_parser.add_argument('--id', type=int, required=True, help='Id of the expense to delete')
+
+update_paraser = subparsers.add_parser('update', help='Update expense')
+update_paraser.add_argument('--id', type=int, required=True, help='Id of the expense to update')
+update_paraser.add_argument('--description', type=str, required=True, help='Description of the expense to update')
+update_paraser.add_argument('--amount', type=float, required=True, help='Amount of the description to update')
+
 args = parser.parse_args()
 
 def add_expense(filename, description, amount):
@@ -33,7 +41,7 @@ def add_expense(filename, description, amount):
     else:
         expenses = []
     
-    next_id = (max((int(t["ID"]) for t in expenses), default=0)) + 1
+    next_id = (max((int(e["ID"]) for e in expenses), default=0)) + 1
 
     expense = {
         "ID": next_id, "Date": datetime.now().strftime("%Y-%m-%d"), "Description": description, "Amount": amount
@@ -80,6 +88,51 @@ def summary(filename):
         sum_expenses.append(float(expense['Amount']))
     print(f"${sum(sum_expenses)}")
     
+def delete(filename, id):
+    if os.path.exists(filename):
+        with open(filename, "r") as file:
+            try:
+                reader = csv.DictReader(file)
+                expenses = list(reader)
+            except csv.Error:
+                expenses = []
+    else:
+        expenses = []
+    
+    expenses = [e for e in expenses if int(e['ID']) != int(id)]
+    
+    with open(filename, "w") as file:
+        csvwriter = csv.DictWriter(file, fieldnames=fields)
+        csvwriter.writeheader()
+        csvwriter.writerows(expenses)
+        
+    print(f"Expense with ID {id} deleted.")
+    
+def update(filename, id, description, amount):
+    if os.path.exists(filename):
+        with open(filename, "r") as file:
+            try:
+                reader = csv.DictReader(file)
+                expenses = list(reader)
+            except csv.Error:
+                expenses = []
+    else:
+        expenses = []
+        
+    for expense in expenses:
+        if int(expense['ID']) == int(id):
+            expense['Description'] = description
+            expense['Amount'] = amount
+            expense['Date'] = datetime.now().strftime("%Y-%m-%d")
+            break
+        
+    with open(filename, "w") as file:
+        csvwriter = csv.DictWriter(file, fieldnames=fields)
+        csvwriter.writeheader()
+        csvwriter.writerows(expenses)
+        
+    print(f"Expense with ID {id} updated.")
+    
 if __name__ == "__main__":
     if args.command == 'add':
         add_expense(filename, args.description, args.amount)
@@ -87,3 +140,7 @@ if __name__ == "__main__":
         list_expenses(filename)
     elif args.command == 'summary':
         summary(filename)
+    elif args.command == "delete":
+        delete(filename, args.id)
+    elif args.command == "update":
+        update(filename, args.id, args.description, args.amount)
