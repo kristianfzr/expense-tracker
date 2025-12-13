@@ -1,3 +1,16 @@
+Metadata-Version: 2.4
+Name: expense-tracker
+Version: 1.0.0
+Summary: An Expense Tracker
+Author: Kristian Kanchev
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/kristianfzr/expense-tracker
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: prettytable>=3.0.0
+
 https://roadmap.sh/projects/expense-tracker
 
 # Expense Tracker
