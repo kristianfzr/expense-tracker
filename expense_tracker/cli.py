@@ -10,28 +10,6 @@ expense_DIR.mkdir(exist_ok=True)
 filename = expense_DIR / "expenses.csv"
 fields = ['ID', 'Date', 'Description', 'Amount']
 
-parser = argparse.ArgumentParser(description='Espense Tracker')
-subparsers = parser.add_subparsers(dest='command', required=True, help='Available commands')
-
-add_parser = subparsers.add_parser('add', help='Add new expense')
-add_parser.add_argument('--description', type=str, required=True, help='Description of the expense')
-add_parser.add_argument('--amount', type=float, required=True, help='Amount of the expense')
-
-list_parser = subparsers.add_parser('list', help='List all expenses')
-
-summary_parser = subparsers.add_parser('summary', help='Summarize all expenses')
-summary_parser.add_argument('--month', type=int, help='Month for summary')
-
-delete_parser = subparsers.add_parser('delete', help='Delete expense by Id')
-delete_parser.add_argument('--id', type=int, required=True, help='Id of the expense to delete')
-
-update_paraser = subparsers.add_parser('update', help='Update expense')
-update_paraser.add_argument('--id', type=int, required=True, help='Id of the expense to update')
-update_paraser.add_argument('--description', type=str, required=True, help='Description of the expense to update')
-update_paraser.add_argument('--amount', type=float, required=True, help='Amount of the description to update')
-
-args = parser.parse_args()
-
 def add_expense(filename, description, amount):
     if os.path.exists(filename):
         with open(filename, "r") as file:
@@ -143,7 +121,29 @@ def update(filename, id, description, amount):
         
     print(f"Expense with ID {id} updated.")
     
-if __name__ == "__main__":
+def main():
+    parser = argparse.ArgumentParser(description='Expense Tracker')
+    subparsers = parser.add_subparsers(dest='command', required=True, help='Available commands')
+
+    add_parser = subparsers.add_parser('add', help='Add new expense')
+    add_parser.add_argument('--description', type=str, required=True, help='Description of the expense')
+    add_parser.add_argument('--amount', type=float, required=True, help='Amount of the expense')
+
+    list_parser = subparsers.add_parser('list', help='List all expenses')
+
+    summary_parser = subparsers.add_parser('summary', help='Summarize all expenses')
+    summary_parser.add_argument('--month', type=int, help='Month for summary')
+
+    delete_parser = subparsers.add_parser('delete', help='Delete expense by Id')
+    delete_parser.add_argument('--id', type=int, required=True, help='Id of the expense to delete')
+
+    update_parser = subparsers.add_parser('update', help='Update expense')
+    update_parser.add_argument('--id', type=int, required=True, help='Id of the expense to update')
+    update_parser.add_argument('--description', type=str, required=True, help='Description of the expense to update')
+    update_parser.add_argument('--amount', type=float, required=True, help='Amount of the description to update')
+
+    args = parser.parse_args()
+    
     if args.command == 'add':
         add_expense(filename, args.description, args.amount)
     elif args.command == 'list':
@@ -157,3 +157,6 @@ if __name__ == "__main__":
         delete(filename, args.id)
     elif args.command == "update":
         update(filename, args.id, args.description, args.amount)
+        
+if __name__ == "__main__":
+    main()
