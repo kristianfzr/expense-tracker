@@ -18,7 +18,9 @@ add_parser.add_argument('--description', type=str, required=True, help='Descript
 add_parser.add_argument('--amount', type=float, required=True, help='Amount of the expense')
 
 list_parser = subparsers.add_parser('list', help='List all expenses')
-list_parser = subparsers.add_parser('summary', help='Summarize all expenses')
+
+summary_parser = subparsers.add_parser('summary', help='Summarize all expenses')
+summary_parser.add_argument('--month', type=int, help='Month for summary')
 
 delete_parser = subparsers.add_parser('delete', help='Delete expense by Id')
 delete_parser.add_argument('--id', type=int, required=True, help='Id of the expense to delete')
@@ -72,7 +74,7 @@ def list_expenses(filename):
         tab.add_row([expense['ID'], expense['Date'], expense['Description'], expense['Amount']])
     print(tab)
     
-def summary(filename):
+def summary(filename, month=None):
     if os.path.exists(filename):
         with open(filename, "r") as file:
             try:
@@ -82,6 +84,14 @@ def summary(filename):
                 expenses = []
     else:
         expenses = []
+    
+    if month:
+        filtered_expenses = []
+        for expense in expenses:
+            expense_date = datetime.strptime(expense['Date'], "%Y-%m-%d")
+            if expense_date.month == month:
+                filtered_expenses.append(expense)
+        expenses = filtered_expenses
     
     sum_expenses = []
     for expense in expenses:
@@ -139,7 +149,10 @@ if __name__ == "__main__":
     elif args.command == 'list':
         list_expenses(filename)
     elif args.command == 'summary':
-        summary(filename)
+        if hasattr(args, 'month') and args.month:
+            summary(filename, args.month)
+        else:
+            summary(filename)
     elif args.command == "delete":
         delete(filename, args.id)
     elif args.command == "update":
